@@ -10,6 +10,8 @@ spec:
   test:
     enable: false
   values:
+    # disabled for hub-and-spoke PoC on cluster 2 (no Gateway API CRDs / Redis dep)
     httpRoute:
-      hostnames:
-        - podinfo.staging
+      enabled: false
+    redis:
+      enabled: false
