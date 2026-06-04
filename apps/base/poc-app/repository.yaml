@@ -1,0 +1,18 @@
+# Flux pulls the cosign-signed poc-chart from Artifact Registry by VERSION.
+# Auth is GKE Workload Identity (provider: gcp) — no static pull secret.
+# verify refuses any chart not signed by the dev KMS key.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: poc-app-chart
+  namespace: cosign-poc          # same ns as the cosign-pub-dev verify key
+spec:
+  interval: 1m
+  provider: gcp
+  url: oci://us-central1-docker.pkg.dev/dev-infra-test-497417/shared-artifacts/poc-chart
+  ref:
+    tag: "0.2.0"                 # <-- bump this to roll out a new chart version (manual for the PoC)
+  verify:
+    provider: cosign
+    secretRef:
+      name: cosign-pub-dev

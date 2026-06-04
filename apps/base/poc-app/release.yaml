@@ -1,0 +1,30 @@
+# Deploys poc-chart into canary-poc (reusing the existing poc-gateway + Prometheus).
+# The chart ships the Deployment (HPA-owned replicas), HPA, Flagger Canary and
+# MetricTemplates — so once this lands, Flagger drives the canary on every chart bump.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: poc-app
+  namespace: cosign-poc
+spec:
+  interval: 10m
+  releaseName: poc-app
+  targetNamespace: canary-poc      # where the workload + Canary land
+  storageNamespace: canary-poc
+  chartRef:
+    kind: OCIRepository
+    name: poc-app-chart
+    namespace: cosign-poc
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  # Per-environment overlay. Iteration A keeps the workload on upstream podinfo
+  # (chart default), so imageRegistry is set but unused until Iteration B supplies
+  # image.digest. Everything else (canary policy, gateway, host) comes from the
+  # chart's values.yaml.
+  values:
+    global:
+      imageRegistry: us-central1-docker.pkg.dev/dev-infra-test-497417/shared-artifacts
