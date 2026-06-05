@@ -12,7 +12,10 @@ spec:
   provider: gcp
   url: oci://us-central1-docker.pkg.dev/dev-infra-test-497417/shared-artifacts/poc-chart
   ref:
-    tag: "0.2.0"                 # <-- bump this to roll out a new chart version (manual for the PoC)
+    # semver range, not a pinned tag: Flux auto-selects the HIGHEST matching version.
+    # CI pushes monotonic 1.0.<run_number>, so a new release is picked up automatically —
+    # no manual bump. (Prod should instead PIN a tag and bump it via a reviewed PR.)
+    semver: ">=0.2.0"
   verify:
     provider: cosign
     secretRef:
